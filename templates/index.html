@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A premium real-time tracker for BigQuery Release Notes, allowing you to browse, search, filter, and share Google Cloud updates.">
+    <title>BigQuery Release Notes Explorer</title>
+    <!-- Google Fonts: Outfit for headers, Inter for body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Link CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- App Container -->
+    <div class="app-layout" id="main-app-layout">
+        
+        <!-- Header Section -->
+        <header class="app-header" id="app-main-header">
+            <div class="header-logo" id="logo-container">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" id="svg-logo">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="url(#grad1)" />
+                    <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="url(#grad2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <defs>
+                        <linearGradient id="grad1" x1="2" y1="2" x2="22" y2="12" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#4285F4" />
+                            <stop offset="50%" stop-color="#34A853" />
+                            <stop offset="100%" stop-color="#FBBC05" />
+                        </linearGradient>
+                        <linearGradient id="grad2" x1="2" y1="12" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#ea4335" />
+                            <stop offset="100%" stop-color="#4285F4" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div class="logo-text">
+                    <h1 class="main-title" id="txt-app-title">BigQuery</h1>
+                    <span class="sub-title" id="txt-app-subtitle">Release Intelligence</span>
+                </div>
+            </div>
+            
+            <div class="header-actions" id="header-action-panel">
+                <div class="sync-status" id="panel-sync-status">
+                    <span class="status-indicator live" id="sync-indicator"></span>
+                    <span class="status-text" id="sync-text">Checking cache...</span>
+                </div>
+                
+                <button class="btn-refresh" id="btn-refresh" title="Refresh Release Notes">
+                    <svg class="refresh-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" id="svg-refresh-spinner">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 11-.57-8.38l.57-.57" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="btn-text" id="btn-refresh-text">Refresh Feed</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats and Filters Dashboard -->
+        <section class="dashboard-stats" id="section-stats-dashboard">
+            <div class="stat-card active" id="stat-card-all" data-filter="all">
+                <div class="stat-info">
+                    <span class="stat-label">Total Updates</span>
+                    <span class="stat-count" id="count-all">0</span>
+                </div>
+                <div class="stat-accent all"></div>
+            </div>
+            
+            <div class="stat-card" id="stat-card-feature" data-filter="feature">
+                <div class="stat-info">
+                    <span class="stat-label">Features</span>
+                    <span class="stat-count text-feature" id="count-feature">0</span>
+                </div>
+                <div class="stat-accent feature"></div>
+            </div>
+            
+            <div class="stat-card" id="stat-card-announcement" data-filter="announcement">
+                <div class="stat-info">
+                    <span class="stat-label">Announcements</span>
+                    <span class="stat-count text-announcement" id="count-announcement">0</span>
+                </div>
+                <div class="stat-accent announcement"></div>
+            </div>
+            
+            <div class="stat-card" id="stat-card-breaking" data-filter="breaking">
+                <div class="stat-info">
+                    <span class="stat-label">Breaking Changes</span>
+                    <span class="stat-count text-breaking" id="count-breaking">0</span>
+                </div>
+                <div class="stat-accent breaking"></div>
+            </div>
+            
+            <div class="stat-card" id="stat-card-issue" data-filter="issue">
+                <div class="stat-info">
+                    <span class="stat-label">Issues</span>
+                    <span class="stat-count text-issue" id="count-issue">0</span>
+                </div>
+                <div class="stat-accent issue"></div>
+            </div>
+            
+            <div class="stat-card" id="stat-card-change" data-filter="change">
+                <div class="stat-info">
+                    <span class="stat-label">Changes</span>
+                    <span class="stat-count text-change" id="count-change">0</span>
+                </div>
+                <div class="stat-accent change"></div>
+            </div>
+        </section>
+
+        <!-- Search Control -->
+        <section class="search-section" id="section-search-controls">
+            <div class="search-wrapper">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" id="svg-search">
+                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input type="text" class="search-input" id="search-box" placeholder="Search updates by keyword, SQL functions, Gemini assistance..." aria-label="Search release notes">
+                <button class="clear-search-btn" id="btn-clear-search" style="display: none;" title="Clear search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="svg-clear-search">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- Main Feed Layout -->
+        <main class="feed-main-container" id="feed-container-wrapper">
+            <div class="feed-header" id="feed-header-bar">
+                <h2 class="feed-section-title" id="txt-feed-header">Latest Release Log</h2>
+                <div class="active-filters-tags" id="container-active-filters" style="display: none;">
+                    <span class="filter-badge" id="badge-active-filter">
+                        Filter: <span class="filter-name" id="txt-active-filter-name">All</span>
+                        <button class="remove-filter-btn" id="btn-remove-filter" title="Remove filter">&times;</button>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Loader -->
+            <div class="loader-container" id="feed-loader" style="display: flex;">
+                <div class="glow-spinner"></div>
+                <p class="loader-text" id="txt-loader-msg">Fetching release entries...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="feed-empty-state" style="display: none;">
+                <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" id="svg-empty">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <h3 class="empty-title" id="txt-empty-title">No release updates found</h3>
+                <p class="empty-desc" id="txt-empty-desc">Try clearing your filters or refreshing the feed to pull down fresh notes from Google Cloud.</p>
+                <button class="btn-secondary" id="btn-reset-filters">Reset Filters</button>
+            </div>
+
+            <!-- Notes List -->
+            <div class="notes-timeline" id="notes-timeline-container" style="display: none;">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </main>
+
+        <!-- Tweet Drawer Panel (Slide-out) -->
+        <aside class="tweet-drawer" id="tweet-composer-drawer">
+            <div class="drawer-header">
+                <div class="drawer-title-group">
+                    <svg class="twitter-x-icon" viewBox="0 0 24 24" fill="currentColor" id="svg-x-logo">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    <h3 class="drawer-title" id="txt-drawer-title">Tweet Composer</h3>
+                </div>
+                <button class="close-drawer-btn" id="btn-close-drawer" aria-label="Close composer">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="svg-close-drawer">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="drawer-content">
+                <div class="selected-note-preview" id="panel-note-preview">
+                    <div class="preview-badge-row">
+                        <span class="badge" id="preview-update-type">Feature</span>
+                        <span class="preview-date" id="preview-update-date">June 15, 2026</span>
+                    </div>
+                    <div class="preview-content-box" id="preview-update-text">
+                        <!-- Brief text preview of selected update -->
+                    </div>
+                </div>
+
+                <div class="composer-area">
+                    <label for="tweet-textarea" class="composer-label">Edit your post before sharing</label>
+                    <div class="textarea-container">
+                        <textarea id="tweet-textarea" class="composer-input" rows="6" maxlength="500"></textarea>
+                    </div>
+                    <div class="composer-meta">
+                        <span class="character-counter" id="lbl-char-counter">0 / 280</span>
+                        <button class="btn-autocut" id="btn-autocut" title="Trims text to X post limit automatically">Auto-Fit to 280</button>
+                    </div>
+                </div>
+
+                <div class="drawer-actions">
+                    <button class="btn-copy-tweet" id="btn-copy-tweet">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="svg-copy-icon">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                        </svg>
+                        <span id="txt-copy-btn">Copy Text</span>
+                    </button>
+                    <button class="btn-tweet" id="btn-post-tweet">
+                        <svg viewBox="0 0 24 24" fill="currentColor" id="svg-x-share">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                        <span>Post to X</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Overlay to close drawer on background click -->
+        <div class="drawer-overlay" id="overlay-drawer"></div>
+
+        <!-- Footer -->
+        <footer class="app-footer" id="app-main-footer">
+            <p>&copy; 2026 BigQuery Release Intelligence Dashboard. All feeds loaded directly from Google Cloud Platform.</p>
+        </footer>
+    </div>
+
+    <!-- Script imports -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
